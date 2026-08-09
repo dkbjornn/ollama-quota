@@ -55,7 +55,7 @@ function pct(fraction) {
 
 /** Pick a StatusDot tone based on usage level. */
 function dotTone(fraction) {
-  if (fraction == null) return 'muted'
+  if (fraction == null || Number.isNaN(fraction)) return 'muted'
   if (fraction >= 0.9) return 'bad'
   if (fraction >= 0.7) return 'warn'
   return 'good'
@@ -137,9 +137,21 @@ function OllamaQuotaChip() {
         queryClient.invalidateQueries({ queryKey: [ID, 'usage'] })
       },
       children: [
-        jsx(StatusDot, {
-          tone: dotTone(displayFrac),
-        }),
+        (() => {
+          const tone = dotTone(displayFrac)
+          // SDK's StatusDot renders 'good' as bg-primary (the app's brand color,
+          // #0053fd blue) — which is visually subtle and reads as "not green"
+          // against a white status bar. Use a clear emerald dot for the safe
+          // state; fall back to StatusDot for warn/bad/muted where amber/red
+          // already match the design system.
+          if (tone === 'good') {
+            return jsx('span', {
+              'aria-hidden': 'true',
+              className: 'inline-block size-1.5 rounded-full bg-emerald-500',
+            })
+          }
+          return jsx(StatusDot, { tone })
+        })(),
         jsx('span', {
           className: 'font-medium',
           children: isLoading && !data
