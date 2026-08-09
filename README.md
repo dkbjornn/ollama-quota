@@ -17,6 +17,7 @@ A compact chip in the bottom status bar:
 - **Red dot**: 90%+ usage
 
 Hover for a full breakdown (per-model request counts), click to force-refresh.
+![Hover View](assets/hover-view.png)
 
 ## Install
 
