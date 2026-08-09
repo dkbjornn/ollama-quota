@@ -61,25 +61,38 @@ function dotTone(fraction) {
   return 'good'
 }
 
-/** Tooltip text with model-level breakdown. */
+/** Tooltip content with model-level breakdown. */
 function buildTooltip(data) {
-  if (!data) return 'Ollama Cloud — loading…'
-  const lines = ['Ollama Cloud Usage']
+  if (!data) return jsx('div', { children: 'Ollama Cloud — loading…' })
+  
+  const elements = [
+    jsx('div', { 
+      key: 'title', 
+      className: 'font-bold mb-1', 
+      children: 'Ollama Cloud Usage' 
+    })
+  ]
+
   if (data.limits?.session) {
     const s = data.limits.session
-    lines.push(`Session: ${pct(s.usage)} used`)
+    elements.push(jsx('div', { key: 's-title', className: 'mt-1', children: `Session: ${pct(s.usage)} used` }))
     for (const m of s.models ?? []) {
-      lines.push(`  ${m.name}: ${m.request_count} reqs`)
+      elements.push(jsx('div', { key: `s-${m.name}`, className: 'text-left', children: `• ${m.name}: ${m.request_count} reqs` }))
     }
   }
+
   if (data.limits?.weekly) {
     const w = data.limits.weekly
-    lines.push(`Weekly: ${pct(w.usage)} used`)
+    elements.push(jsx('div', { key: 'w-title', className: 'mt-1', children: `Weekly: ${pct(w.usage)} used` }))
     for (const m of w.models ?? []) {
-      lines.push(`  ${m.name}: ${m.request_count} reqs`)
+      elements.push(jsx('div', { key: `w-${m.name}`, className: 'text-left', children: `• ${m.name}: ${m.request_count} reqs` }))
     }
   }
-  return lines.join('\n')
+
+  return jsxs('div', {
+    className: 'flex flex-col text-left leading-tight bg-white text-black p-2 rounded shadow-sm',
+    children: elements,
+  })
 }
 
 // ── Component ──────────────────────────────────────────────────────────
