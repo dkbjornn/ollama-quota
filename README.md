@@ -35,7 +35,7 @@ Get your key at: https://ollama.com/settings
 
 ## How it works
 
-The plugin asks the Hermes gateway (via `shell.exec` RPC) to read `OLLAMA_API_KEY` from the `.env` file, then polls `https://ollama.com/api/usage` every 60 seconds. It renders a `statusBar.right` chip using the app's `Tip` and `StatusDot` components — the "healthy" state uses an emerald span (the SDK's `StatusDot tone="good"` is the app's brand blue, not green).
+The plugin asks the Hermes gateway (via `shell.exec` RPC) to read `OLLAMA_API_KEY` from the active profile's `.env` (falling back to `~/.hermes/.env`), then polls `https://ollama.com/api/usage` every 60 seconds. The API call also routes through `shell.exec` because the Ollama Cloud API does not return CORS headers, so a renderer's direct `fetch` is blocked. The chip uses `Popover` (for the multi-line breakdown — `Tip` is designed for short string labels and collapses block content) plus `StatusDot` — the "healthy" state uses an emerald span (the SDK's `StatusDot tone="good"` is the app's brand blue, not green).
 
 No fork, no build step — just a single `plugin.js` file.
 
