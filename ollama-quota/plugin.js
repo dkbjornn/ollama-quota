@@ -117,8 +117,12 @@ function OllamaQuotaChip() {
   const [open, setOpen] = useState(false)
 
   // 1. Fetch the API key once (cached for the plugin's lifetime).
+  //    queryKey carries a version: the react-query cache SURVIVES plugin
+  //    reloads, so a null fetched by an older revision (e.g. before the
+  //    profile-.env walker existed) would be reused forever. Bump the version
+  //    whenever the fetch logic changes.
   const { data: apiKey } = useQuery({
-    queryKey: [ID, 'apikey'],
+    queryKey: [ID, 'apikey', 'v2'],
     queryFn: fetchApiKey,
     staleTime: Infinity,
     retry: 1,
@@ -185,7 +189,7 @@ function OllamaQuotaChip() {
                 ? 'Ollama …'
                 : apiKey
                   ? `Ollama ${pct(sessionFrac)}/${pct(weeklyFrac)}`
-                  : 'Ollama ⚠',
+                  : 'Ollama ⚠ (no key)',
             }),
           ],
         }),
